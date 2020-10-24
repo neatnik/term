@@ -1,0 +1,114 @@
+@import url('https://cdnjs.cloudflare.com/ajax/libs/hack-font/3.3.0/web/hack.min.css');
+@import url('https://rsms.me/inter/inter.css');
+html { font-family: 'Inter', sans-serif; }
+@supports (font-variation-settings: normal) {
+    html { font-family: 'Inter var', sans-serif; }
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    font-feature-settings: "cpsp", "frac", "tnum";
+    font-size: 1.1em;
+    background: #fff;
+    color: #000;
+}
+
+main {
+    margin: auto;
+    padding: 1em;
+    max-width: 60em;
+    border: 0px solid red;
+}
+
+header {
+    border: 0px solid blue;
+    font-weight: 700;
+    font-size: 1.3em;
+    margin: 1em 0 2em 0;
+}
+
+header a:link,
+header a:visited,
+header a:hover,
+header a:active {
+    text-decoration: none;
+    color: #000;
+}
+
+#icon {
+    width: 1.7em;
+    height: 1.7em;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: .8em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 500;
+    margin: 2rem 0;
+    line-height: 130%;
+}
+
+p, li {
+    line-height: 150%;
+}
+
+.flexed * {
+    border: 0px dotted #ccc;
+}
+
+.flexed {
+    border: 0px solid red;
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 2rem;
+    row-gap: 0rem;
+}
+
+.flex-one {
+    flex: 1;
+}
+
+.flex-two {
+    flex: 2;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+input, textarea, select, option {
+    font-family: 'Inter', sans-serif;
+    font-size: 100%;
+}
+
+label {
+    font-weight: bold;
+}
+
+code, pre {
+    font-family: 'Hack', monospace;
+    font-size: 90%;
+}
+
+pre code {
+    display: block;
+    padding: 1em;
+}
+
+code {
+    color: #333;
+    background: #eee;
+    padding: .2em;
+    border-radius: 0.2em;
+}
+
+a:link, a:visited, a:hover a:active {
+    color: #000;
+}

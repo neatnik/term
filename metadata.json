@@ -1,0 +1,6 @@
+{
+	"title": "Term",
+	"description": "Term is a tiny, lightweight CMS built for Terminal Land",
+	"index": "README.md",
+	"stylesheet": "/tools/term/term.css"
+}
