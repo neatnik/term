@@ -36,11 +36,13 @@ Term supports “collections”, which lets you manage some metadata at one leve
 Here’s a list of available metadata items:
 
 * **`index`**: the file that should be served when the directory is accessed
-* **`stylesheet`**: the stylesheet path/filename to be used
 * **`title`**: the page’s title
-* **`description`**: the page’s description
+* **`collection_title`**: the collection’s title
 * **`url`**: the page’s canonical URL
-* **`icon`**: any HTML that you’d like to include for a page or collection specific icon (SVG works well here)
+* **`collection_url`**: the collection’s canonical URL
+* **`description`**: the page’s description
+* **`stylesheet`**: the stylesheet path/filename to be used
 * **`head`**: any additional stuff you’d like to include in your page’s `<head>` section
+* **`icon`**: any HTML that you’d like to include for a page or collection specific icon (SVG works well here)
 
 That’s all. Hope you find it useful.
