@@ -51,17 +51,42 @@ if(file_exists('Parsedown.php')) {
 function process($item, $template) {
 	global $metadata;
 	global $collection_metadata;
-	if(isset($collection_metadata->$item)) $template = str_replace('{{'.$item.'}}', $collection_metadata->$item, $template);
-	else if(isset($metadata->$item)) $template = str_replace('{{'.$item.'}}', $metadata->$item, $template);
-	else $template = str_replace('{{'.$item.'}}', null, $template);
+	$set = false;
+	
+	if(isset($metadata->$item)) {
+		$template = str_replace('{{'.$item.'}}', $metadata->$item, $template);
+		$set = true;
+	}
+	
+	if(isset($collection_metadata->$item)) {
+		$template = str_replace('{{'.$item.'}}', $collection_metadata->$item, $template);
+		$set = true;
+	}
+	
+	if(!$set) $template = str_replace('{{'.$item.'}}', null, $template);
+	
 	return $template;
 }
 
 // Execute replacements
-$template_items = array('head', 'stylesheet', 'url', 'icon', 'title', 'description');
+$template_items = array('stylesheet', 'collection_url', 'url', 'icon', 'collection_title', 'title', 'description');
 foreach($template_items as $item) {
 	$template = process($item, $template);
 }
+
+// Handle {{head}} if set
+if(isset($collection_metadata->head)) {
+	$template = str_replace('{{head}}', file_get_contents($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'].$collection_metadata->head), $template);
+}
+else if(isset($metadata->head)) {
+	$template = str_replace('{{head}}', file_get_contents($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'].$metadata->head), $template);
+}
+else {
+	$template = str_replace('{{head}}', null, $template);
+}
+
+if(file_exists($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'].'metadata.json')) $metadata = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'].'metadata.json'));
+else die('No metadata file was found.');
 
 // Default for {{url}}, just in case
 $template = str_replace('{{url}}', 'https://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], $template);
