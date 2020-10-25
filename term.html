@@ -5,11 +5,11 @@
 <title>{{title}}</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta property="og:title" content="{{description}}"/>
-<meta name="description" content="{{description}}"/>
-<meta property="og:description" content="{{description}}"/>
-<meta property="og:url" content="{{url}}"/>
-<link rel="canonical" href="{{url}}"/>
+<meta property="og:title" content="{{title}}">
+<meta property="og:description" content="{{description}}">
+<meta property="og:url" content="{{url}}">
+<meta name="description" content="{{description}}">
+<link rel="canonical" href="{{url}}">
 <link rel="stylesheet" href="{{stylesheet}}">
 {{head}}
 </head>
@@ -18,11 +18,15 @@
 <main>
 
 <header>
-<a href="{{url}}"><div id="icon">{{icon}}</div>{{title}}</a>
+<a href="{{url}}"><div id="icon">{{icon}}</div>{{collection_title}}</a>
 </header>
 
 {{content}}
 
 </main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+<script>
+anchors.add();
+</script>
 </body>
 </html>
