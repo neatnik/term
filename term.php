@@ -22,27 +22,40 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
 
+// Configuration
+define('TEMPLATE', '/var/www/html/tools/term/term.html');
+
 // Load the template
-if(file_exists('term.html')) $template = file_get_contents('term.html');
+if(file_exists(TEMPLATE)) $template = file_get_contents(TEMPLATE);
 else die('No template file was found.');
 
+// Prepare base path
+$request_uri = explode('/', $_SERVER['REQUEST_URI']);
+array_pop($request_uri);
+$request_uri = implode('/', $request_uri).'/';
+
 // Load page metadata
-if(file_exists($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'].'metadata.json')) $metadata = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'].'metadata.json'));
+if(file_exists($_SERVER['DOCUMENT_ROOT'].$request_uri.'metadata.json')) $metadata = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].$request_uri.'metadata.json'));
 else die('No metadata file was found.');
 
 // Load collection metadata
-if(file_exists($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'].'../metadata.json')) $collection_metadata = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'].'../metadata.json'));
+if(file_exists($_SERVER['DOCUMENT_ROOT'].$request_uri.'../metadata.json')) $collection_metadata = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].$request_uri.'../metadata.json'));
 else $collection_metadata = null;
 
 // Include index content
 ob_start();
-include_once($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'].$metadata->index);
+if(isset($content)) {
+	echo $content;
+}
+else {
+	include_once($_SERVER['DOCUMENT_ROOT'].$request_uri.$metadata->index);
+}
 $content = ob_get_contents();
 ob_end_clean();
 
 // Process Markdown
-if(file_exists('Parsedown.php')) {
-	include_once('Parsedown.php');
+if(file_exists('/var/www/html/tools/term/Parsedown.php')) {
+	include_once('/var/www/html/tools/term/Parsedown.php');
 	$Parsedown = new Parsedown();
 	$content = $Parsedown->text($content);
 }
@@ -74,22 +87,29 @@ foreach($template_items as $item) {
 	$template = process($item, $template);
 }
 
-// Handle {{head}} if set
-if(isset($collection_metadata->head)) {
-	$template = str_replace('{{head}}', file_get_contents($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'].$collection_metadata->head), $template);
-}
-else if(isset($metadata->head)) {
-	$template = str_replace('{{head}}', file_get_contents($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'].$metadata->head), $template);
+// Handle {{head}} if set, either in content or in metadata
+if(isset($term_head)) {
+	$template = str_replace('{{head}}', $term_head, $template);
 }
 else {
-	$template = str_replace('{{head}}', null, $template);
+	if(isset($collection_metadata->head)) {
+		$template = str_replace('{{head}}', file_get_contents($_SERVER['DOCUMENT_ROOT'].$request_uri.$collection_metadata->head), $template);
+	}
+	else if(isset($metadata->head)) {
+		$template = str_replace('{{head}}', file_get_contents($_SERVER['DOCUMENT_ROOT'].$request_uri.$metadata->head), $template);
+	}
+	else {
+		$template = str_replace('{{head}}', null, $template);
+	}
 }
 
-if(file_exists($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'].'metadata.json')) $metadata = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'].'metadata.json'));
+/*
+if(file_exists($_SERVER['DOCUMENT_ROOT'].$request_uri.'metadata.json')) $metadata = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].$request_uri.'metadata.json'));
 else die('No metadata file was found.');
+*/
 
 // Default for {{url}}, just in case
-$template = str_replace('{{url}}', 'https://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], $template);
+$template = str_replace('{{url}}', 'https://'.$_SERVER['HTTP_HOST'].$request_uri, $template);
 
 // Add the content
 $template = str_replace('{{content}}', $content, $template);
