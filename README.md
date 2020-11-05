@@ -33,6 +33,15 @@ You can edit `term.html` to customize the template however you’d like.
 
 Term supports “collections”, which lets you manage some metadata at one level above the current page. For example, if you have some related pages being served under a parent directory, that parent directory is a collection and you can include a `metadata.json` file there. That JSON string should include `url`, `title`, and `icon` items which will override those values from the local metadata file.
 
+You can also set a local metadata for any given page by including a special JSON chunk, like so:
+
+```
+%{
+  "title": "Unique page title",
+  "description": "Individual page description",
+}%
+```
+
 Here’s a list of available metadata items:
 
 * **`index`**: the file that should be served when the directory is accessed

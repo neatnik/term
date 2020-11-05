@@ -2,7 +2,7 @@
 
 /* Term: a tiny, lightweight CMS purpose-built for Terminal Land
 
-Copyright (c) 2020 Neatnik
+Copyright © 2020 Neatnik
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,12 +31,29 @@ else die('No template file was found.');
 
 // Prepare base path
 $request_uri = explode('/', $_SERVER['REQUEST_URI']);
-array_pop($request_uri);
-$request_uri = implode('/', $request_uri).'/';
+unset($request_uri[0]);
 
-// Load page metadata
-if(file_exists($_SERVER['DOCUMENT_ROOT'].$request_uri.'metadata.json')) $metadata = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].$request_uri.'metadata.json'));
-else die('No metadata file was found.');
+
+$request_uri = array_values($request_uri);
+$tmp_request_uri = '/';
+$possible_request_uris = array();
+foreach($request_uri as $segment) {
+	$tmp_request_uri = $tmp_request_uri . $segment.'/';
+	$possible_request_uris[] = $tmp_request_uri;
+}
+
+$possible_request_uris = array_reverse($possible_request_uris);
+
+foreach($possible_request_uris as $request_uri) {
+	if(file_exists($_SERVER['DOCUMENT_ROOT'].$request_uri.'metadata.json')) {
+		$metadata = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].$request_uri.'metadata.json'));
+		goto skip;
+	}
+}
+
+die('No metadata file was found.');
+
+skip:
 
 // Load collection metadata
 if(file_exists($_SERVER['DOCUMENT_ROOT'].$request_uri.'../metadata.json')) $collection_metadata = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].$request_uri.'../metadata.json'));
@@ -45,6 +62,13 @@ else $collection_metadata = null;
 // Include index content
 ob_start();
 if(isset($content)) {
+	preg_match('/%{(.*)}%/s', $content, $local_metadata);
+	if(isset($local_metadata[1])) {
+		$remove = $local_metadata[0];
+		$local_metadata = json_decode('{'.$local_metadata[1].'}');
+		$content = str_replace($remove, null, $content);
+	}
+	
 	echo $content;
 }
 else {
@@ -62,9 +86,15 @@ if(file_exists('/var/www/html/tools/term/Parsedown.php')) {
 
 // Process template replacements
 function process($item, $template) {
+	global $local_metadata;
 	global $metadata;
 	global $collection_metadata;
 	$set = false;
+	
+	if(isset($local_metadata->$item)) {
+		$template = str_replace('{{'.$item.'}}', $local_metadata->$item, $template);
+		$set = true;
+	}
 	
 	if(isset($metadata->$item)) {
 		$template = str_replace('{{'.$item.'}}', $metadata->$item, $template);
@@ -102,11 +132,6 @@ else {
 		$template = str_replace('{{head}}', null, $template);
 	}
 }
-
-/*
-if(file_exists($_SERVER['DOCUMENT_ROOT'].$request_uri.'metadata.json')) $metadata = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].$request_uri.'metadata.json'));
-else die('No metadata file was found.');
-*/
 
 // Default for {{url}}, just in case
 $template = str_replace('{{url}}', 'https://'.$_SERVER['HTTP_HOST'].$request_uri, $template);
